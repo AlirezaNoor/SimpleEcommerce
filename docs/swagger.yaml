@@ -1,0 +1,108 @@
+basePath: /
+definitions:
+  models.Order:
+    properties:
+      id:
+        type: integer
+      product_ids:
+        items:
+          type: integer
+        type: array
+      total_price:
+        type: number
+    type: object
+  models.Product:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for a simple ecommerce platform.
+  title: Ecommerce API
+  version: "1.0"
+paths:
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: ایجاد یک سفارش جدید با لیست محصولات و مبلغ کل سفارش.
+      parameters:
+      - description: Order Data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: ثبت سفارش جدید
+      tags:
+      - orders
+  /products:
+    get:
+      description: لیست تمامی محصولات موجود در فروشگاه را برمی‌گرداند.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: دریافت لیست محصولات
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: ایجاد و ثبت یک محصول جدید در فروشگاه.
+      parameters:
+      - description: Product Data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: افزودن محصول جدید
+      tags:
+      - products
+swagger: "2.0"
