@@ -20,10 +20,21 @@ definitions:
       price:
         type: number
     type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
-  description: API for a simple ecommerce platform.
+  description: API for a simple ecommerce platform including users and categories.
   title: Ecommerce API
   version: "1.0"
 paths:
@@ -105,4 +116,34 @@ paths:
       summary: افزودن محصول جدید
       tags:
       - products
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: ثبت اطلاعات یک کاربر جدید در سیستم.
+      parameters:
+      - description: User Data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: ایجاد کاربر جدید
+      tags:
+      - users
 swagger: "2.0"
