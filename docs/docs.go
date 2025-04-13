@@ -15,128 +15,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/orders": {
-            "post": {
-                "description": "ایجاد یک سفارش جدید با لیست محصولات و مبلغ کل سفارش.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "orders"
-                ],
-                "summary": "ثبت سفارش جدید",
-                "parameters": [
-                    {
-                        "description": "Order Data",
-                        "name": "order",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Order"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Order"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/products": {
+        "/products/all": {
             "get": {
-                "description": "لیست تمامی محصولات موجود در فروشگاه را برمی‌گرداند.",
+                "description": "این متد همه محصولات را برمی‌گرداند",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "products"
+                    "محصولات"
                 ],
-                "summary": "دریافت لیست محصولات",
+                "summary": "دریافت همه محصولات",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Product"
+                                "$ref": "#/definitions/product.Product"
                             }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "ایجاد و ثبت یک محصول جدید در فروشگاه.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "products"
-                ],
-                "summary": "افزودن محصول جدید",
-                "parameters": [
-                    {
-                        "description": "Product Data",
-                        "name": "product",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Product"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Product"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }
             }
         },
-        "/users": {
+        "/products/create": {
             "post": {
-                "description": "ثبت اطلاعات یک کاربر جدید در سیستم.",
+                "description": "این متد یک محصول جدید ایجاد می‌کند",
                 "consumes": [
                     "application/json"
                 ],
@@ -144,37 +48,104 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "محصولات"
                 ],
-                "summary": "ایجاد کاربر جدید",
+                "summary": "ایجاد محصول جدید",
                 "parameters": [
                     {
-                        "description": "User Data",
-                        "name": "user",
+                        "description": "اطلاعات محصول",
+                        "name": "product",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/product.Product"
                         }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/product.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/delete/{id}": {
+            "delete": {
+                "description": "این متد یک محصول را حذف می‌کند",
+                "tags": [
+                    "محصولات"
+                ],
+                "summary": "حذف محصول",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "شناسه محصول",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "حذف موفقیت‌آمیز"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "description": "این متد یک محصول را با استفاده از ID برمی‌گرداند",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "محصولات"
+                ],
+                "summary": "دریافت محصول با شناسه",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "شناسه محصول",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/product.Product"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -182,26 +153,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Order": {
+        "product.Product": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
+                "description": {
+                    "type": "string"
                 },
-                "product_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "total_price": {
-                    "type": "number"
-                }
-            }
-        },
-        "models.Product": {
-            "type": "object",
-            "properties": {
                 "id": {
                     "type": "integer"
                 },
@@ -210,23 +167,9 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
+                "stock": {
                     "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         }
@@ -243,6 +186,7 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "API for a simple ecommerce platform including users and categories.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+ 
 }
 
 func init() {

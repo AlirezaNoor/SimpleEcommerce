@@ -1,12 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
 
 	_ "ecommerce/docs" // import docs for swagger
-	"ecommerce/internal/handlers"
+
+	"ecommerce/internal/product"
 	"ecommerce/internal/repository"
 
 	"github.com/gorilla/mux"
@@ -25,6 +27,13 @@ func main() {
 	if dsn == "" {
 		dsn = "postgres://postgres:55375447@localhost:5432/ecommerce?sslmode=disable"
 	}
+
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
 	repository.InitDB(dsn)
 
 	router := mux.NewRouter()
@@ -33,15 +42,10 @@ func main() {
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	// روت‌های محصولات
-	router.HandleFunc("/products", handlers.GetProducts).Methods("GET")
-	router.HandleFunc("/products", handlers.CreateProduct).Methods("POST")
-	// روت سفارشات
-	router.HandleFunc("/orders", handlers.CreateOrder).Methods("POST")
-	// روت‌های کاربران
-	router.HandleFunc("/users", handlers.CreateUser).Methods("POST")
-	// (می‌توانید روت دریافت کاربران را نیز اضافه کنید)
-	// روت‌های دسته‌بندی‌ها (در صورت نیاز)
-	// router.HandleFunc("/categories", handlers.CreateCategory).Methods("POST")
+	repo := product.NewRepository(db)
+	service := product.NewService(repo)
+	productHandler := product.NewHandler(service)
+	productHandler.RegisterRoutes(router)
 
 	log.Println("سرور روی پورت 8080 در حال اجراست...")
 	log.Fatal(http.ListenAndServe(":8080", router))
